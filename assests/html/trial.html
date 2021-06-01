@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <title>VOLSBB Login</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-+0n0xVW2eSR5OomGNYDnhzAbDsOXxcvSN1TPprVMTNDbiYZCxYbOOl7+AMvyTG2x" crossorigin="anonymous">
+</head>
+
+<body style="padding-top: 25px">
+    <div class="container">
+        <form class="form-horizontal">
+            <input type="username" id="username" placeholder="Username" class="form-control"><br>
+            <input type="password" id="password" placeholder="Password" class="form-control"><br>
+            <input type="checkbox" id="remember" value="remember"> Remember me?<br>
+            <br>
+            <div class="text-center">
+                <input type="button" onclick="login()" value="Log in" class="btn btn-success">
+                <input type="button" onclick="logout()" value="Log out" class="btn btn-danger">
+            </div>
+        </form>
+        <br>
+        <div class="text-center">
+            <p id="msgBoxSuccess" style="color:#007E33;display:none;">Success!</p>
+            <p id="msgBoxFailure" style="color:#CC0000;display:none;">Failure!</p>
+        </div>
+    </div>
+    <script src="../js/trial.js"></script>
+</body>
+
+</html>

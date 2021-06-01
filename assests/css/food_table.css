@@ -1,3 +1,6 @@
-.food_tables{
-    margin-top: 3%;
+.search_table {
+  text-align: right;
+}
+.input_table {
+  font-size: 12px;
 }

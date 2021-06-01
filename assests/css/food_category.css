@@ -1,6 +1,6 @@
-.food-category {
-  margin-top: 40px;
+.search_category {
+  text-align: right;
 }
-.foodCategoryitems{
-  text-align: center;
+.input_category {
+  font-size: 12px;
 }

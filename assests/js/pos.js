@@ -1,14 +1,8 @@
 const { remote, app, ipcRenderer, ipcMain } = require("electron");
-const BrowserWindow = remote.BrowserWindow;
 
-const allList = document.getElementById("allCategoryByList");
-const all_food_category_list = document.getElementById("food_category_list");
-const myList = document.getElementById("myItemList");
-const customer_type_dropdown = document.getElementById("c_type_dropdown");
-const food_varient_table = document.getElementById("food_varient_datas");
-const food_availability_table = document.getElementById(
-  "food_availability_datas"
-);
+const categoryUl = document.getElementById("category_item");
+const foodList = document.getElementById("foods");
+const foodByAllCategory = document.getElementById("allCategory");
 
 //different tabs
 function pos(evt, posSytem) {
@@ -25,233 +19,89 @@ function pos(evt, posSytem) {
   evt.currentTarget.className += " active";
 }
 
-function getFoodId(id) {
-  console.log("Getting food id", id);
-
-  let win = new BrowserWindow({
-    height: 400,
-    width: 820,
-    maximizable: false,
-
-    title: "Select food and addon",
-    webPreferences: {
-      nodeIntegration: true,
-      contextIsolation: false,
-      enableRemoteModule: true,
-    },
-  });
-  win.loadFile("assests/html/cartProduct.html");
-
-  win.webContents.openDevTools();
-  const knex = require("knex")({
-    client: "sqlite3",
-    connection: {
-      filename: "./database.sqlite",
-    },
-    useNullAsDefault: true,
-  });
-
-  let addTocartItems = knex("foods")
-    .join("varient", "varient.food_id", "foods.id")
-
-    .select("foods.product_name", "varient.name", "varient.price")
-    .where("foods.id", id);
-  //console.log("CartItems", addTocartItems);
-  addTocartItems.then(function (rows) {
-    win.webContents.send("foodVarientResultSent", rows);
-    console.log("Food rows", rows);
-  });
-
-  // win.setMenuBarVisibility(false);
-
-  let addOnItems = knex("foods")
-    .join("add_on_assign", "add_on_assign.food_id", "foods.id")
-    .join("add_on", "add_on_assign.add_on_id", "add_on.id")
-    .distinct("add_on.add_on_name")
-    .select("add_on.add_on_name", "add_on.price")
-    .where("foods.id", id);
-
-  addOnItems.then(function (rows) {
-    win.webContents.send("addOnResultSent", rows);
-    console.log("Food varient", rows);
-  });
-
-  win.on("closed", () => {
-    win = null;
-  });
-}
-
+//sending category id to fetch foods by specific category
 function getCategoryId(id) {
-  console.log("Getting the category id", id);
-  ipcRenderer.send("eachCategoryIdSent", id);
+  console.log("categoryId", id);
+  ipcRenderer.send("categoryId", id);
 }
 
-ipcRenderer.on("replySentFromEachCategoryId", (evt, results) => {
-  all_food_category_list.innerHTML = "";
+//creating dynamic category on pos page
+document.addEventListener("DOMContentLoaded", () => {
+  ipcRenderer.send("categoryNamesLoaded");
+});
+
+ipcRenderer.on("categoryNamesReplySent", function (event, results) {
+  results.forEach(function (result) {
+    var li = document.createElement("li");
+    var a = document.createElement("a");
+    a.textContent = result.name;
+    li.appendChild(a);
+    li.onclick = () => getCategoryId(result.id);
+    categoryUl.appendChild(li);
+  });
+});
+//end of dynamic category on pos page
+
+// displaying food by category
+ipcRenderer.on("foodsByCategoryReplySent", (evt, foods) => {
+  foodList.innerHTML = "";
   var div = "";
 
-  results.forEach((x) => {
+  foods.forEach((food) => {
     div += `
     <div class="card col-md-3" style="width: 12rem; height: 170px; margin: 4px;">
-    <img src="${x.product_image}" height="100" width="206" class="card-img-top">
-      <div><p><a href="#" style="text-decoration:none; color:black; text-align: center;" id=${x.id} onclick = {getFoodId(${x.id})}>
-      ${x.product_name}
+    <img src="${food.product_image}" height="100" width="206" class="card-img-top">
+      <div style="text-align: center;"><p><a href="#"  style="text-decoration:none; color:black;" id=${food.id} onclick = {getFoodId(${food.id})}>
+      ${food.product_name}
         </a></p>
       </div>
     </div>`;
   });
 
-  all_food_category_list.innerHTML += div;
+  foodList.innerHTML += div;
 });
 
-// Getting customer type dropdown data
-document.addEventListener("DOMContentLoaded", () => {
-  ipcRenderer.send("customerTypeDropdownLoaded");
+// displaying food by all  category
+foodByAllCategory.addEventListener("click", () => {
+  ipcRenderer.send("foodByALlCategory");
 });
-
-ipcRenderer.on("replySentCustomerTypeDropdown", function (evt, results) {
-  customer_type_dropdown.innerHTML = "";
-  var option = "";
-
-  results.forEach((x) => {
-    option += '<option value="3">' + x.type_name + "</option>";
-  });
-
-  customer_type_dropdown.innerHTML += option;
-});
-
-//loading the data when window loaded
-document.addEventListener("DOMContentLoaded", () => {
-  ipcRenderer.send("allCategoryListLoaded");
-});
-
-ipcRenderer.on("replySentAllCategory", function (evt, results) {
-  all_food_category_list.innerHTML = "";
-
+ipcRenderer.on("foodsByAllCategoryReplySent", (evt, foods) => {
+  foodList.innerHTML = "";
   var div = "";
 
-  results.forEach((x) => {
-    div +=
-      '<div class="card col-md-3" style="width: 12rem; height: 170px; margin: 4px;">';
-    div +=
-      '<img src="' +
-      x.product_image +
-      '" height="100" width="206" class="card-img-top">';
-    div += '<div class="card-body">';
-    div +=
-      `<p><a href="#" style="text-decoration:none; color:black; text-align: center;" id=${x.id} onclick = {getFoodId(${x.id})}>` +
-      x.product_name +
-      "</a></p>";
-    div += "</div>";
-
-    div += "</div>";
-  });
-
-  all_food_category_list.innerHTML += div;
-});
-
-//getting category data when clicked all
-allList.addEventListener("click", () => {
-  ipcRenderer.send("allCategoryListLoaded");
-});
-
-ipcRenderer.on("replySentAllCategory", function (evt, results) {
-  all_food_category_list.innerHTML = "";
-
-  var div = "";
-
-  results.forEach((x) => {
+  foods.forEach((food) => {
     div += `
-    <div class="col-md-3 d-flex">
-      <div class="card  flex-fill w-100 ">
-      <img src="${x.product_image}" height="100" width="206" class="card-img-top">
-        <div class="card-body">
-          <p><a href="#" style="text-decoration:none; color:black; text-align: center;" id=${x.id} onclick = {getFoodId(${x.id})}> 
-          ${x.product_name}
-          </a></p>
-        </div>
-      </div> 
+    <div class="card col-md-3" style="width: 12rem; height: 170px; margin: 4px;">
+    <img src="${food.product_image}" height="100" width="206" class="card-img-top">
+      <div style="text-align: center;"><p><a href="#"  style="text-decoration:none; color:black;" id=${food.id} onclick = {getFoodId(${food.id})}>
+      ${food.product_name}
+        </a></p>
       </div>
-      `;
+    </div>`;
   });
 
-  all_food_category_list.innerHTML += div;
+  foodList.innerHTML += div;
 });
+// end of displaying food by all category
 
-//creating dynamic category in new order result page
+// displaying the foods when the page loaded
 document.addEventListener("DOMContentLoaded", () => {
-  ipcRenderer.send("newOrderCategoryItemLoaded");
+  ipcRenderer.send("foodOnPageLoaded");
 });
+ipcRenderer.on("foodOnPageLoadedReplySent", (evt, foods) => {
+  foodList.innerHTML = "";
+  var div = "";
 
-ipcRenderer.on("replySentCategoryListResult", function (event, results) {
-  // Create an unordered list
-  var list = document.createElement("ul");
-
-  // Create a list item for each wizard
-  // and append it to the list
-  results.forEach(function (result) {
-    var li = document.createElement("li");
-    var a = document.createElement("a");
-
-    a.textContent = result.name;
-    li.appendChild(a);
-    li.onclick = () => getCategoryId(result.id);
-
-    list.appendChild(li);
+  foods.forEach((food) => {
+    div += `
+    <div class="card col-md-3" style="width: 12rem; height: 170px; margin: 4px;">
+    <img src="${food.product_image}" height="100" width="206" class="card-img-top">
+      <div style="text-align: center;"><p><a href="#"  style="text-decoration:none; color:black;" id=${food.id} onclick = {getFoodId(${food.id})}>
+      ${food.product_name}
+        </a></p>
+      </div>
+    </div>`;
   });
 
-  // Inject into the DOM
-  myList.appendChild(list);
-});
-
-//foods varient result
-document.addEventListener("DOMContentLoaded", () => {
-  ipcRenderer.send("foodVarientWindow");
-});
-ipcRenderer.on("resultSentFromFoodsVarient", function (event, result) {
-  food_varient_table.innerHTML = "";
-  var tr = "";
-  result.forEach((x) => {
-    tr += "<tr>";
-    tr +=
-      "<td>" +
-      x.id +
-      "</td>" +
-      "<td>" +
-      x.name +
-      "</td>" +
-      "<td>" +
-      x.product_name +
-      "</td>";
-    tr += "</tr>";
-  });
-  food_varient_table.innerHTML += tr;
-});
-
-//foods availability result
-document.addEventListener("DOMContentLoaded", () => {
-  ipcRenderer.send("foodAvailabilityWindow");
-});
-ipcRenderer.on("resultSentFromFoodAvailability", function (event, result) {
-  food_availability_table.innerHTML = "";
-  var tr = "";
-  result.forEach((x) => {
-    tr += "<tr>";
-    tr +=
-      "<td>" +
-      x.id +
-      "</td>" +
-      "<td>" +
-      x.product_name +
-      "</td>" +
-      "<td>" +
-      x.avail_day +
-      "</td>" +
-      "<td>" +
-      x.avail_time +
-      "</td>";
-    tr += "</tr>";
-  });
-  food_availability_table.innerHTML += tr;
-  food_availability_table.style.fontSize = "12px";
+  foodList.innerHTML += div;
 });

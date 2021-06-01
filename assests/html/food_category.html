@@ -1,45 +1,47 @@
-<!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+    <title>Food category section -Dhaka Restaurant</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta3/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-eOJMYsd53ii+scO/bJGFsiCZc+5NDVN2yr8+0RDqr0Ql0h+rP48ckxlpbzKgwra6" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     <link rel="stylesheet" href="../css/food_category.css">
 </head>
+
 <body>
-   
-    <div class=" food-category table-responsive">
-        <table class="table table-bordered" id ="my_table">
-            <thead >
-                <tr>
-                    <th class="foodCategoryitems" >SI</th>
-                    <th class="foodCategoryitems">Image</th>
-                    <th class="foodCategoryitems">Category Name</th>
-                    <th class="foodCategoryitems">Parent menu</th>
-                    <th class="foodCategoryitems">Status</th>
+    <div class="container-fluid">
 
+        <div class="search_category mt-4 mb-2">
+            <label for="searchCategory" style="font-size: 12; font-weight: bold;">Search Category</label>
+            <input id="searchCategory" class="input_category" type="text">
+        </div>
 
-                </tr>
-            </thead>
-            <tbody id="datas" class="foodTable">
-                <!-- <tr id="food_data_frm_db">
-                    <td id="SI" class="foodValues"></td>
-                    <td id="image" class="foodValues"></td>
-                    <td id="category_name" class="foodValues"></td>
-                    <td id="parent_menu" class="foodValues"></td>
-                    <td id="status" class="foodValues"></td>
-
-                </tr> -->
-               
-
-
-            </tbody>
-        </table>
+        <div class=" food-category table-responsive">
+            <table class="table table-bordered" id="my_table">
+                <thead>
+                    <tr style="font-size: 12px;font-weight: bold;">
+                        <th>SI</th>
+                        <th>Image</th>
+                        <th>Category Name</th>
+                        <th>Parent menu</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody id="food_category_table">
+                </tbody>
+            </table>
+        </div>
     </div>
-    <script src="../js/food_category.js">
-    
+    <script src=" https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta3/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-JEW9xMcG8R+pH31jmWH6WWP0WintQrMb4s7ZOdauHnUtxwoG2vI5DkLtS3qm9Ekf" crossorigin="anonymous">
+        </script>
+
+    <script src="../js/foodCategory.js">
+
     </script>
 </body>
+
 </html>

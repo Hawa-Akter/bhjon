@@ -53,7 +53,7 @@ body {
 }
 .second_section {
   height: 500px;
-  background-color: darkgray;
+  background-color: white;
 }
 .new_order {
   padding: 0px;
@@ -100,4 +100,13 @@ body {
 #myList ul li {
   background-color: #37a000;
   color: white;
+}
+
+.remove-item {
+  line-height: 1;
+  color: red;
+  border-color: #37a000;
+}
+.remove-item:focus {
+  outline: 0;
 }
